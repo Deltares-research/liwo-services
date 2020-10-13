@@ -6,6 +6,7 @@ COPY requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
 COPY . /opt/liwo
+RUN (cd /opt/liwo; pip install -e .)
 
 EXPOSE 5000
-CMD ["python", "/opt/liwo/liwo_services/app.py"]
+CMD ["liwo_services", "run"]
