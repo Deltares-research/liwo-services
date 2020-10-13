@@ -34,7 +34,7 @@ setup(
     description="LIWO Backend Services",
     entry_points={
         'console_scripts': [
-            'liwo_services=liwo_services.cli:main',
+            'liwo_services=liwo_services.cli:cli',
         ],
     },
     install_requires=requirements,

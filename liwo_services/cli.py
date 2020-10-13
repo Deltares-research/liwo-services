@@ -2,15 +2,18 @@
 import sys
 import click
 
+import liwo_services.app
 
-@click.command()
-def main(args=None):
-    """Console script for liwo_services."""
-    click.echo("Replace this message by putting your code into "
-               "liwo_services.cli.main")
-    click.echo("See click documentation at https://click.palletsprojects.com/")
-    return 0
+from flask.cli import FlaskGroup
 
+def create_app():
+    # return the created wsgi app
+    return liwo_services.app.app
+
+@click.group(cls=FlaskGroup, create_app=create_app)
+def cli():
+    """Management script for the liwo_services application application."""
+    pass
 
 if __name__ == "__main__":
-    sys.exit(main())  # pragma: no cover
+    sys.exit(cli())  # pragma: no cover
