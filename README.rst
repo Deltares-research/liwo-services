@@ -30,7 +30,9 @@ LIWO Backend Services
 Features
 --------
 
-* TODO
+* Start the services using `FLASK_APP=liwo_services.app:app flask run`.
+* Or using a wsgi host using the app `liwo_services.app:app`.
+* Or after running `pip install -e .` in the source directory, using the cli `liwo_services run`.
 
 Credits
 -------
