@@ -46,8 +46,7 @@ def loadLayerSets():
     """
 
 
-    con = engine.connect()
-    rs = con.execute('SELECT website.sp_selectjson_maplayersets_groupedby_mapcategories()')
+    rs = db.session.execute('SELECT website.sp_selectjson_maplayersets_groupedby_mapcategories()')
 
     result = rs.fetchall()
 
@@ -108,13 +107,11 @@ def loadBreachLayer():
     setname = setnames.get(body['layername'], default_setname)
     breachid = body['breachid']
 
-    Session = sessionmaker(bind=engine)
-    session = Session()
 
+    # TODO: parameters in query parameters
     query = "SELECT website.sp_selectjson_maplayerset_floodscen_breachlocation_id_generic({}, '{}')".format(breachid, setname)
 
-    con = engine.connect()
-    rs = con.execute(query)
+    rs = db.session.execute(query)
     result = rs.fetchall()
     return {"d": json.dumps(result[0][0])}
 
@@ -124,17 +121,13 @@ def loadLayerSetById():
     """
     body: { id }
     """
-
     body = request.get_json()
     id = body['id']
 
-    Session = sessionmaker(bind=engine)
-    session = Session()
-
+    # TODO: use params option in execute.
     query = "SELECT website.sp_selectjson_layerset_layerset_id({})".format(id)
 
-    con = engine.connect()
-    rs = con.execute(query)
+    rs = db.session.execute(query)
     result = rs.fetchall()
     return {"d": json.dumps(result[0][0])}
 
@@ -146,23 +139,10 @@ def getFeatureIdByScenarioId():
     body = request.get_json()
     floodsimulationid = body['floodsimulationid']
 
-    Session = sessionmaker(bind=engine)
-    session = Session()
-
+    # TODO: use params option in execute
     query = "SELECT static_information.sp_selectjson_breachlocationid({})".format(floodsimulationid)
 
-    con = engine.connect()
-    rs = con.execute(query)
+    rs = db.session.execute(query)
     result = rs.fetchall()
 
     return {"d": json.dumps(result[0][0])}
-
-
-# @app.route('/Maps.asmx/DownloadZipFileDataLayers')
-# def ():
-#   return {}
-
-
-# If we're running in stand alone mode, run the application
-if __name__ == '__main__':
-    app.run(debug=True, host= '0.0.0.0')
