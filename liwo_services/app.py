@@ -1,18 +1,22 @@
-from flask import Flask, jsonify, request
+import json
+import io
+import zipfile
+import time
+
+import flask
+from flask import request
 from flask_cors import CORS
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm import mapper, sessionmaker
 
 from flask_sqlalchemy import SQLAlchemy
 
-import json
-
 import liwo_services.settings
 
 def create_app_db():
     env = liwo_services.settings.dotenv_values()
     # Create the application instance
-    app = Flask(__name__)
+    app = flask.Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = env['SQLALCHEMY_DATABASE_URI']
     db = SQLAlchemy(app)
     CORS(app)
@@ -89,10 +93,10 @@ def loadBreachLayer():
      TODO: remove setname directly use layerName.
     """
 
-    body = request.get_json()
+    body = request.json
 
-    # Setnames according to c-sharp backend
-    setnames = {
+    # Set names according to c-sharp backend
+    set_names = {
         "waterdiepte": "Waterdiepte_flood_scenario_set",
         "stroomsnelheid": "Stroomsnelheid_flood_scenario_set",
         "stijgsnelheid": "Stijgsnelheid_flood_scenario_set",
@@ -103,15 +107,14 @@ def loadBreachLayer():
     }
 
     # Default value for setname
-    default_setname = "Waterdiepte_flood_scenario_set"
-    setname = setnames.get(body['layername'], default_setname)
-    breachid = body['breachid']
+    default_set_name = "Waterdiepte_flood_scenario_set"
+    set_name = set_names.get(body['layername'], default_set_name)
+    breach_id = body['breachid']
 
+    # define query with parameters
+    query = "SELECT website.sp_selectjson_maplayerset_floodscen_breachlocation_id_generic(:breach_id, :set_name)"
 
-    # TODO: parameters in query parameters
-    query = "SELECT website.sp_selectjson_maplayerset_floodscen_breachlocation_id_generic({}, '{}')".format(breachid, setname)
-
-    rs = db.session.execute(query)
+    rs = db.session.execute(query, breach_id, set_name)
     result = rs.fetchall()
     return {"d": json.dumps(result[0][0])}
 
@@ -121,13 +124,13 @@ def loadLayerSetById():
     """
     body: { id }
     """
-    body = request.get_json()
-    id = body['id']
+    body = request.json
+    layerset_id = body['id']
 
     # TODO: use params option in execute.
-    query = "SELECT website.sp_selectjson_layerset_layerset_id({})".format(id)
+    query = "SELECT website.sp_selectjson_layerset_layerset_id(:layerset_id)"
 
-    rs = db.session.execute(query)
+    rs = db.session.execute(query, layerset_id=layerset_id)
     result = rs.fetchall()
     return {"d": json.dumps(result[0][0])}
 
@@ -136,13 +139,48 @@ def getFeatureIdByScenarioId():
     """
     body:{ mapid: scenarioId }
     """
-    body = request.get_json()
-    floodsimulationid = body['floodsimulationid']
+    body = request.json
+    flood_simulation_id = body['floodsimulationid']
 
     # TODO: use params option in execute
-    query = "SELECT static_information.sp_selectjson_breachlocationid({})".format(floodsimulationid)
+    query = "SELECT static_information.sp_selectjson_breachlocationid(:flood_simulation_id)"
 
-    rs = db.session.execute(query)
+    rs = db.session.execute(query, flood_simulation_id=flood_simulation_id)
     result = rs.fetchall()
 
     return {"d": json.dumps(result[0][0])}
+
+
+@app.route('/liwo.ws/Maps.asmx/DownloadZipFileDataLayers', methods=["POST"])
+def download_zip():
+    """
+    body: {"layers":"scenario_18734,gebiedsindeling_doorbraaklocaties_buitendijks","name":"test"}
+    """
+    body = request.json
+    layers = body.get('layers', "").split(',')
+    name = body.get("name", "").strip()
+    if not name:
+        name = "DownloadLIWO"
+
+
+    # security check
+    for layer in layers:
+        if '..' in layer or layer.startswith('/'):
+            raise ValueError('Security issue: layer name not valid')
+
+    stream = io.BytesIO()
+    with zipfile.ZipFile(stream, 'w') as zf:
+        for layer in layers:
+            data = zipfile.ZipInfo(layer)
+            data.date_time = time.localtime(time.time())[:6]
+            data.compress_type = zipfile.ZIP_DEFLATED
+            zf.write(data, layer)
+    stream.seek(0)
+
+    resp = flask.send_file(
+        stream,
+        mimetype='application/zip',
+        attachment_filename="{}.zip".format(name),
+        as_attachment=True
+    )
+    return
