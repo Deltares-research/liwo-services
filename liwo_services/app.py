@@ -10,6 +10,7 @@ from sqlalchemy.orm import mapper, sessionmaker
 from flask_sqlalchemy import SQLAlchemy
 
 # side effect loads the env
+import liwo_services
 import liwo_services.settings
 
 logger = logging.getLogger(__name__)
@@ -38,7 +39,7 @@ def home():
 
     :return:        the rendered template 'home.html'
     """
-    return {'test': 'hoi'}
+    return {'version': liwo_services.__version__}
 
 
 @app.route('/liwo.ws/Authentication.asmx/Login', methods=["OPTIONS", "POST"])

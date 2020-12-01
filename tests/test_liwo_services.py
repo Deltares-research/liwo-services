@@ -8,7 +8,7 @@ from click.testing import CliRunner
 
 from liwo_services import liwo_services
 from liwo_services import cli
-
+import liwo_services.app
 
 @pytest.fixture
 def response():
@@ -25,6 +25,28 @@ def test_content(response):
     # from bs4 import BeautifulSoup
     # assert 'GitHub' in BeautifulSoup(response.content).title.string
 
+@pytest.fixture
+def app():
+    yield liwo_services.app.app
+
+@pytest.fixture
+def db():
+    yield liwo_services.app.db
+
+@pytest.fixture
+def client():
+    app = liwo_services.app.app
+    with app.test_client() as client:
+        with app.app_context():
+            yield client
+
+
+
+def test_root(client):
+    """Start with a blank database."""
+
+    result = client.get('/')
+    assert result.status_code == 200
 
 def test_command_line_interface():
     """Test the CLI."""
