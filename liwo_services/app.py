@@ -1,3 +1,7 @@
+import json
+import logging
+import os
+
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from sqlalchemy import create_engine, MetaData, Table
@@ -5,15 +9,19 @@ from sqlalchemy.orm import mapper, sessionmaker
 
 from flask_sqlalchemy import SQLAlchemy
 
-import json
-
+# side effect loads the env
 import liwo_services.settings
 
+logger = logging.getLogger(__name__)
+
 def create_app_db():
-    env = liwo_services.settings.dotenv_values()
+    """load the dot env values"""
     # Create the application instance
+    liwo_services.settings.load_env()
+
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = env['SQLALCHEMY_DATABASE_URI']
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
+    logger.info("loaded database %s", app.config['SQLALCHEMY_DATABASE_URI'])
     db = SQLAlchemy(app)
     CORS(app)
     return app, db

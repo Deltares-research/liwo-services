@@ -1,10 +1,17 @@
 """Console script for liwo_services."""
 import sys
+import logging
+
 import click
 
 import liwo_services.app
 
 from flask.cli import FlaskGroup
+
+logging.basicConfig(
+    level=logging.INFO
+)
+
 
 def create_app():
     # return the created wsgi app
