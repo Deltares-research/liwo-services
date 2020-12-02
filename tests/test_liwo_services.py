@@ -8,30 +8,36 @@ from click.testing import CliRunner
 
 from liwo_services import liwo_services
 from liwo_services import cli
-
+import liwo_services.app
 
 @pytest.fixture
-def response():
-    """Sample pytest fixture.
+def app():
+    yield liwo_services.app.app
 
-    See more at: http://doc.pytest.org/en/latest/fixture.html
-    """
-    # import requests
-    # return requests.get('https://github.com/audreyr/cookiecutter-pypackage')
+@pytest.fixture
+def db():
+    yield liwo_services.app.db
+
+@pytest.fixture
+def client():
+    app = liwo_services.app.app
+    with app.test_client() as client:
+        with app.app_context():
+            yield client
 
 
-def test_content(response):
-    """Sample pytest test function with the pytest fixture as an argument."""
-    # from bs4 import BeautifulSoup
-    # assert 'GitHub' in BeautifulSoup(response.content).title.string
 
+def test_root(client):
+    """Test the root url"""
+    result = client.get('/')
+    assert result.status_code == 200
 
 def test_command_line_interface():
     """Test the CLI."""
     runner = CliRunner()
-    result = runner.invoke(cli.main)
+    result = runner.invoke(cli.cli)
     assert result.exit_code == 0
-    assert 'liwo_services.cli.main' in result.output
-    help_result = runner.invoke(cli.main, ['--help'])
+    assert 'run' in result.output
+    help_result = runner.invoke(cli.cli, ['--help'])
     assert help_result.exit_code == 0
-    assert '--help  Show this message and exit.' in help_result.output
+    assert '--help' in help_result.output
