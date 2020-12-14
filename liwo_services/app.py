@@ -2,24 +2,35 @@ import json
 import io
 import zipfile
 import time
+import logging
+import os
 
 import flask
-from flask import request
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm import mapper, sessionmaker
 
 from flask_sqlalchemy import SQLAlchemy
 
+# side effect loads the env
+import liwo_services
 import liwo_services.settings
 
+logger = logging.getLogger(__name__)
+
 def create_app_db():
-    env = liwo_services.settings.dotenv_values()
+    """load the dot env values"""
+    liwo_services.settings.load_env()
     # Create the application instance
-    app = flask.Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = env['SQLALCHEMY_DATABASE_URI']
-    db = SQLAlchemy(app)
+    app = Flask(__name__)
+    # add db settings
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
+    # add cors headers
     CORS(app)
+    # load the database
+    db = SQLAlchemy(app)
+    logger.info("loaded database %s", app.config['SQLALCHEMY_DATABASE_URI'])
     return app, db
 
 
@@ -34,7 +45,7 @@ def home():
 
     :return:        the rendered template 'home.html'
     """
-    return {'test': 'hoi'}
+    return {'version': liwo_services.__version__}
 
 
 @app.route('/liwo.ws/Authentication.asmx/Login', methods=["OPTIONS", "POST"])

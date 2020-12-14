@@ -34,6 +34,13 @@ Features
 * Or using a wsgi host using the app `liwo_services.app:app`.
 * Or after running `pip install -e .` in the source directory, using the cli `liwo_services run`.
 
+Routes
+-----
+
+The following url's should be available:
+
+/Maps.asmx/DownloadZipFileDataLayers
+
 Credits
 -------
 
