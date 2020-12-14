@@ -4,11 +4,15 @@ import zipfile
 import time
 import logging
 import os
+import pathlib
+import tempfile
+import subprocess
 
 import flask
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from sqlalchemy import create_engine, MetaData, Table
+import sqlalchemy.engine.url
 from sqlalchemy.orm import mapper, sessionmaker
 
 from flask_sqlalchemy import SQLAlchemy
@@ -169,9 +173,12 @@ def download_zip():
     """
     body = request.json
     layers = body.get('layers', "").split(',')
+    layers_str = body.get('layers', '')
     name = body.get("name", "").strip()
     if not name:
         name = "DownloadLIWO"
+
+    data_dir = pathlib.Path('/var/local/geoserver')
 
 
     # security check
@@ -179,19 +186,72 @@ def download_zip():
         if '..' in layer or layer.startswith('/'):
             raise ValueError('Security issue: layer name not valid')
 
-    stream = io.BytesIO()
-    with zipfile.ZipFile(stream, 'w') as zf:
-        for layer in layers:
-            data = zipfile.ZipInfo(layer)
-            data.date_time = time.localtime(time.time())[:6]
-            data.compress_type = zipfile.ZIP_DEFLATED
-            zf.write(data, layer)
-    stream.seek(0)
+    # TODO Add custom log stream for invalid layers
+    log_stream = io.StringIO()
+    # define a handler
+    layer_logger = logging.getLogger('layer-export')
+    layer_logger.setLevel(logging.DEBUG)
+    for handler in layer_logger.handlers:
+        layer_logger.removeHandler(handler)
+    # add the new handler
+    handler = logging.StreamHandler(log_stream)
+    layer_logger.addHandler(handler)
+
+    query = "SELECT website.sp_select_filepaths_maplayers(:map_layers)"
+    rs = db.session.execute(query, dict(map_layers=layers_str))
+    result = rs.fetchall()
+    logger.info(f"{result}")
+
+    # lookup relevant parts for cli script
+    url = sqlalchemy.engine.url.make_url(app.config['SQLALCHEMY_DATABASE_URI'])
+
+    zip_stream = io.BytesIO()
+    with zipfile.ZipFile(zip_stream, 'w') as zf:
+
+        for row in result:
+            items = row[0].split(',')
+            # this is an odd format
+            # ('static_information.tbl_breachlocations,shape1,static_information_geodata.infrastructuur_dijkringen,shape',)
+            for item, type_ in zip(items[:-1:2], items[1:-1:2]):
+
+                if 'shape' in type_:
+                    with tempfile.TemporaryDirectory(prefix='liwo_') as tmp_dir:
+                        # export table to shapefile
+                        table = item
+                        filename = table.split('.')[-1]
+                        path = pathlib.Path(tmp_dir) / (filename + '.shp')
+                        args = [
+                            "pgsql2shp",
+                            "-f", str(path),
+                            "-h", url.host,
+                            "-p", str(url.port),
+                            "-u", url.username,
+                            "-P", url.password,
+                            url.database,
+                            table
+                        ]
+                        # TODO: how to just pass args
+                        cmd = " ".join(args)
+                        process = subprocess.run(cmd, shell=True, capture_output=True)
+                        if process.returncode:
+                            layer_logger.debug(f"error exporting {table}: {' '.join(args)}\nstdout:\n{process.stdout}\nstderr:\n {process.stderr}")
+                        for f in pathlib.Path(tmp_dir).glob('*'):
+                            zf.write(f, f.name)
+                        layer_logger.debug(f"table {table} added")
+                elif 'tif' in type_:
+                    path = data_dir / item.lstrip('/')
+                    zf.write(path, path.name)
+                    layer_logger.debug(f"item {item} not added")
+        zf.writestr('log.txt', log_stream.getvalue())
+
+
+    # rewind
+    zip_stream.seek(0)
 
     resp = flask.send_file(
-        stream,
+        zip_stream,
         mimetype='application/zip',
         attachment_filename="{}.zip".format(name),
         as_attachment=True
     )
-    return
+    return resp
