@@ -19,6 +19,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 # side effect loads the env
 import liwo_services
+import liwo_services.export
 import liwo_services.settings
 
 logger = logging.getLogger(__name__)
@@ -30,11 +31,12 @@ def create_app_db():
     app = Flask(__name__)
     # add db settings
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
+    app.config['DATA_DIR'] = os.environ['DATA_DIR']
     # add cors headers
     CORS(app)
     # load the database
     db = SQLAlchemy(app)
-    logger.info("loaded database %s", app.config['SQLALCHEMY_DATABASE_URI'])
+    logger.info("loaded database %s, files from %s", app.config['SQLALCHEMY_DATABASE_URI'], app.config['DATA_DIR'])
     return app, db
 
 
@@ -172,13 +174,13 @@ def download_zip():
     body: {"layers":"scenario_18734,gebiedsindeling_doorbraaklocaties_buitendijks","name":"test"}
     """
     body = request.json
-    layers = body.get('layers', "").split(',')
+    layers = body.get('layers', '').split(',')
     layers_str = body.get('layers', '')
-    name = body.get("name", "").strip()
+    name = body.get('name', '').strip()
     if not name:
-        name = "DownloadLIWO"
+        name = 'DownloadLIWO'
 
-    data_dir = pathlib.Path('/var/local/geoserver')
+    data_dir = pathlib.Path(app.config['DATA_DIR'])
 
 
     # security check
@@ -186,72 +188,22 @@ def download_zip():
         if '..' in layer or layer.startswith('/'):
             raise ValueError('Security issue: layer name not valid')
 
-    # TODO Add custom log stream for invalid layers
-    log_stream = io.StringIO()
-    # define a handler
-    layer_logger = logging.getLogger('layer-export')
-    layer_logger.setLevel(logging.DEBUG)
-    for handler in layer_logger.handlers:
-        layer_logger.removeHandler(handler)
-    # add the new handler
-    handler = logging.StreamHandler(log_stream)
-    layer_logger.addHandler(handler)
 
-    query = "SELECT website.sp_select_filepaths_maplayers(:map_layers)"
+    query = 'SELECT website.sp_select_filepaths_maplayers(:map_layers)'
     rs = db.session.execute(query, dict(map_layers=layers_str))
     result = rs.fetchall()
-    logger.info(f"{result}")
+    logger.info(f'{result}')
 
     # lookup relevant parts for cli script
     url = sqlalchemy.engine.url.make_url(app.config['SQLALCHEMY_DATABASE_URI'])
 
-    zip_stream = io.BytesIO()
-    with zipfile.ZipFile(zip_stream, 'w') as zf:
-
-        for row in result:
-            items = row[0].split(',')
-            # this is an odd format
-            # ('static_information.tbl_breachlocations,shape1,static_information_geodata.infrastructuur_dijkringen,shape',)
-            for item, type_ in zip(items[:-1:2], items[1:-1:2]):
-
-                if 'shape' in type_:
-                    with tempfile.TemporaryDirectory(prefix='liwo_') as tmp_dir:
-                        # export table to shapefile
-                        table = item
-                        filename = table.split('.')[-1]
-                        path = pathlib.Path(tmp_dir) / (filename + '.shp')
-                        args = [
-                            "pgsql2shp",
-                            "-f", str(path),
-                            "-h", url.host,
-                            "-p", str(url.port),
-                            "-u", url.username,
-                            "-P", url.password,
-                            url.database,
-                            table
-                        ]
-                        # TODO: how to just pass args
-                        cmd = " ".join(args)
-                        process = subprocess.run(cmd, shell=True, capture_output=True)
-                        if process.returncode:
-                            layer_logger.debug(f"error exporting {table}: {' '.join(args)}\nstdout:\n{process.stdout}\nstderr:\n {process.stderr}")
-                        for f in pathlib.Path(tmp_dir).glob('*'):
-                            zf.write(f, f.name)
-                        layer_logger.debug(f"table {table} added")
-                elif 'tif' in type_:
-                    path = data_dir / item.lstrip('/')
-                    zf.write(path, path.name)
-                    layer_logger.debug(f"item {item} not added")
-        zf.writestr('log.txt', log_stream.getvalue())
-
-
-    # rewind
-    zip_stream.seek(0)
+    # load datasets in a zip file
+    zip_stream = liwo_services.export.add_result_to_zip(result, url, data_dir)
 
     resp = flask.send_file(
         zip_stream,
         mimetype='application/zip',
-        attachment_filename="{}.zip".format(name),
+        attachment_filename='{}.zip'.format(name),
         as_attachment=True
     )
     return resp
