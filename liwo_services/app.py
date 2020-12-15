@@ -191,8 +191,9 @@ def download_zip():
 
     query = 'SELECT website.sp_select_filepaths_maplayers(:map_layers)'
     rs = db.session.execute(query, dict(map_layers=layers_str))
+    # Results in the comma seperated list
+    # [('static_information.tbl_breachlocations,shape1,static_information_geodata.infrastructuur_dijkringen,shape',)]
     result = rs.fetchall()
-    logger.info(f'{result}')
 
     # lookup relevant parts for cli script
     url = sqlalchemy.engine.url.make_url(app.config['SQLALCHEMY_DATABASE_URI'])
