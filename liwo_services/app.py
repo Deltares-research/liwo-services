@@ -31,7 +31,7 @@ def create_app_db():
     app = Flask(__name__)
     # add db settings
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
-    app.config['DATA_DIR'] = os.environ['DATA_DIR']
+    app.config['DATA_DIR'] = os.environ.get('DATA_DIR', '')
     # add cors headers
     CORS(app)
     # load the database
