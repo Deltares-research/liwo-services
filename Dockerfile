@@ -2,6 +2,8 @@ FROM python:3.7.6
 
 RUN mkdir /opt/liwo
 
+RUN apt-get update && apt-get -y install postgis gdal-bin
+
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
