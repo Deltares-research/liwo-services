@@ -1,7 +1,16 @@
-FROM tiangolo/uwsgi-nginx-flask:python3.7
+FROM tiangolo/uwsgi-nginx-flask:python3.8
 
-COPY ./liwo_services /app
+# no questions please...
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update
+# make system up to date
+RUN apt-get -y update && apt-get -y upgrade
+
+# add requirements file
 COPY requirements.txt /tmp/requirements.txt
+
+# add python dependencies
 RUN pip install -r /tmp/requirements.txt
+
+# add app under default location
+COPY ./liwo_services /app
