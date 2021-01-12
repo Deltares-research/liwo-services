@@ -1,14 +1,19 @@
-FROM python:3.7.6
+FROM tiangolo/uwsgi-nginx-flask:python3.8
 
-RUN mkdir /opt/liwo
+# no questions please...
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get -y install postgis gdal-bin
+# make system up to date
+RUN apt-get -y update && apt-get -y upgrade && apt-get -y install postgis gdal-bin
 
 COPY requirements.txt /tmp/requirements.txt
+
+# add python dependencies
 RUN pip install -r /tmp/requirements.txt
 
-COPY . /opt/liwo
-RUN (cd /opt/liwo; pip install -e .)
+# add app under default location
+COPY . /app
+# install
+RUN pip install -e /app
 
-EXPOSE 5000
-CMD ["liwo_services", "run"]
+WORKDIR /app/liwo_services

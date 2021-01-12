@@ -4,7 +4,7 @@ import logging
 
 import click
 
-import liwo_services.app
+import liwo_services.main
 
 from flask.cli import FlaskGroup
 
@@ -15,7 +15,7 @@ logging.basicConfig(
 
 def create_app():
     # return the created wsgi app
-    return liwo_services.app.app
+    return liwo_services.main.app
 
 @click.group(cls=FlaskGroup, create_app=create_app)
 def cli():

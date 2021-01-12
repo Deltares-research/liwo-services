@@ -51,7 +51,7 @@ def home():
 
     :return:        the rendered template 'home.html'
     """
-    return {'version': liwo_services.__version__}
+    return 'liwo_service'
 
 
 @app.route('/liwo.ws/Authentication.asmx/Login', methods=["OPTIONS", "POST"])
@@ -86,7 +86,7 @@ def loadLayerSets():
             "tools": [],
             "mymaps": [],
             "mapextent": "",
-            "webserviceURL": "http://localhost:5000/liwo.ws/",
+            "webserviceURL": os.environ['WEBSERVICE_URL'],
             "administrator": "false"
         }
     }
@@ -167,7 +167,6 @@ def getFeatureIdByScenarioId():
 
     return {"d": json.dumps(result[0][0])}
 
-
 @app.route('/liwo.ws/Maps.asmx/DownloadZipFileDataLayers', methods=["POST"])
 def download_zip():
     """
@@ -208,3 +207,7 @@ def download_zip():
         as_attachment=True
     )
     return resp
+
+if __name__ == "__main__":
+    # Only for debugging while developing
+    app.run(host='0.0.0.0', debug=True, port=80, threaded=True)
