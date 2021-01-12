@@ -12,4 +12,8 @@ COPY requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
 # add app under default location
-COPY ./liwo_services /app
+COPY . /app
+# install
+RUN pip install -e /app
+
+WORKDIR /app/liwo_services
