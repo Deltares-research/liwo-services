@@ -153,7 +153,7 @@ def loadLayerSetById():
 @app.route('/liwo.ws/Maps.asmx/GetBreachLocationId', methods=["POST"])
 def getFeatureIdByScenarioId():
     """
-    body:{ mapid: scenarioId }
+    body:{ floodsimulationid: scenarioId }
     """
     body = request.json
 
