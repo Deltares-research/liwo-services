@@ -32,6 +32,18 @@ def test_root(client):
     result = client.get('/')
     assert result.status_code == 200
 
+def test_login(client):
+    """Test the login url"""
+    result = client.post('/liwo.ws/Authentication.asmx/Login', {})
+    assert result.status_code == 200
+
+def test_scenarios_per_breach(client):
+    """Test the scenarios_per_breach url"""
+    body = {'layername': "waterdiepte", "breachid": 1}
+    result = client.post('/liwo.ws/Tools/FloodImage.asmx/GetScenariosPerBreachGeneric', json=body)
+    assert result.status_code == 200
+
+
 def test_command_line_interface():
     """Test the CLI."""
     runner = CliRunner()

@@ -14,7 +14,6 @@ from flask_cors import CORS
 from sqlalchemy import create_engine, MetaData, Table
 import sqlalchemy.engine.url
 from sqlalchemy.orm import mapper, sessionmaker
-
 from flask_sqlalchemy import SQLAlchemy
 
 # side effect loads the env
@@ -129,9 +128,9 @@ def loadBreachLayer():
     breach_id = body['breachid']
 
     # define query with parameters
-    query = "SELECT website.sp_selectjson_maplayerset_floodscen_breachlocation_id_generic(:breach_id, :set_name)"
+    query = 'SELECT website.sp_selectjson_maplayerset_floodscen_breachlocation_id_generic(:breach_id, :set_name)'
 
-    rs = db.session.execute(query, breach_id, set_name)
+    rs = db.session.execute(query, {"breach_id": breach_id, "set_name": set_name})
     result = rs.fetchall()
     return {"d": json.dumps(result[0][0])}
 
@@ -145,27 +144,28 @@ def loadLayerSetById():
     layerset_id = body['id']
 
     # TODO: use params option in execute.
-    query = "SELECT website.sp_selectjson_layerset_layerset_id(:layerset_id)"
+    query = 'SELECT website.sp_selectjson_layerset_layerset_id(:layerset_id)'
 
-    rs = db.session.execute(query, layerset_id=layerset_id)
+    rs = db.session.execute(query, {'layerset_id': layerset_id})
     result = rs.fetchall()
-    return {"d": json.dumps(result[0][0])}
+    return {'d': json.dumps(result[0][0])}
 
 @app.route('/liwo.ws/Maps.asmx/GetBreachLocationId', methods=["POST"])
 def getFeatureIdByScenarioId():
     """
-    body:{ mapid: scenarioId }
+    body:{ floodsimulationid: scenarioId }
     """
     body = request.json
+
     flood_simulation_id = body['floodsimulationid']
 
     # TODO: use params option in execute
-    query = "SELECT static_information.sp_selectjson_breachlocationid(:flood_simulation_id)"
+    query = 'SELECT static_information.sp_selectjson_breachlocationid(:flood_simulation_id)'
 
-    rs = db.session.execute(query, flood_simulation_id=flood_simulation_id)
+    rs = db.session.execute(query, {'flood_simulation_id': flood_simulation_id})
     result = rs.fetchall()
 
-    return {"d": json.dumps(result[0][0])}
+    return {'d': json.dumps(result[0][0])}
 
 @app.route('/liwo.ws/Maps.asmx/DownloadZipFileDataLayers', methods=["POST"])
 def download_zip():
