@@ -39,9 +39,9 @@ Routes
 
 The following url's should be available:
 
+* home: /                                                                                      
 * download_zip: /liwo.ws/Maps.asmx/DownloadZipFileDataLayers               
 * getFeatureIdByScenarioId: /liwo.ws/Maps.asmx/GetBreachLocationId                                          
-* home: /                                                                                      
 * loadBreachLayer: /liwo.ws/Tools/FloodImage.asmx/GetScenariosPerBreachGeneric 
 * loadLayerSetById: /liwo.ws/Maps.asmx/GetLayerSet        
 * loadLayerSets: /liwo.ws/Authentication.asmx/Login                          
