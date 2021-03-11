@@ -37,7 +37,7 @@ Features
 Routes
 -----
 
-The following url's should be available:
+The following url's are available:
 
 * home: /                                                                                      
 * download_zip: /liwo.ws/Maps.asmx/DownloadZipFileDataLayers               
