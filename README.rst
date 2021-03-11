@@ -38,17 +38,13 @@ Routes
 -----
 
 The following url's should be available:
-+---------------------------+----------+-------------------------------------------------------------+
-| Endpoint                  | Methods  | Rule                                                        |
-+---------------------------+----------+-------------------------------------------------------------+
-| download_zip              | POST     | /liwo.ws/Maps.asmx/DownloadZipFileDataLayers                |
-| getFeatureIdByScenarioId  | POST     | /liwo.ws/Maps.asmx/GetBreachLocationId                      |                      
-| home                      | GET      | /                                                           |                             
-| loadBreachLayer           | POST     | /liwo.ws/Tools/FloodImage.asmx/GetScenariosPerBreachGeneric |
-| loadLayerSetById          | POST     | /liwo.ws/Maps.asmx/GetLayerSet                              |              
-| loadLayerSets             | POST     | /liwo.ws/Authentication.asmx/Login                          |                  
-| static                    | GET      | /static/<path:filename>                                     |       
-+---------------------------+----------+-------------------------------------------------------------+
+* download_zip: /liwo.ws/Maps.asmx/DownloadZipFileDataLayers               
+* getFeatureIdByScenarioId: /liwo.ws/Maps.asmx/GetBreachLocationId                                          
+* home: /                                                                                      
+* loadBreachLayer: /liwo.ws/Tools/FloodImage.asmx/GetScenariosPerBreachGeneric 
+* loadLayerSetById: /liwo.ws/Maps.asmx/GetLayerSet        
+* loadLayerSets: /liwo.ws/Authentication.asmx/Login                          
+
 Credits
 -------
 
