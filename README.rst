@@ -38,9 +38,17 @@ Routes
 -----
 
 The following url's should be available:
-
-/Maps.asmx/DownloadZipFileDataLayers
-
++---------------------------+----------+-------------------------------------------------------------+
+| Endpoint                  | Methods  | Rule                                                        |
++---------------------------+----------+-------------------------------------------------------------+
+| download_zip              | POST     | /liwo.ws/Maps.asmx/DownloadZipFileDataLayers                |
+| getFeatureIdByScenarioId  | POST     | /liwo.ws/Maps.asmx/GetBreachLocationId                      |                      
+| home                      | GET      | /                                                           |                             
+| loadBreachLayer           | POST     | /liwo.ws/Tools/FloodImage.asmx/GetScenariosPerBreachGeneric |
+| loadLayerSetById          | POST     | /liwo.ws/Maps.asmx/GetLayerSet                              |              
+| loadLayerSets             | POST     | /liwo.ws/Authentication.asmx/Login                          |                  
+| static                    | GET      | /static/<path:filename>                                     |       
++---------------------------+----------+-------------------------------------------------------------+
 Credits
 -------
 
