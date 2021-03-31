@@ -33,7 +33,7 @@ def add_result_to_zip(result, url, data_dir):
                         table = item
                         filename = table.split('.')[-1]
                         path = pathlib.Path(tmp_dir) / (filename + '.shp')
-                        # Password should be available in evironment variabel: PGPASSWORD
+                        # Password should be available in evironment variable: PGPASSWORD
                         args = [
                             "pgsql2shp",
                             "-f", str(path),
