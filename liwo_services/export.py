@@ -26,20 +26,20 @@ def add_result_to_zip(result, url, data_dir):
             items = row[0].split(',')
             # this is an odd format
             # ('static_information.tbl_breachlocations,shape1,static_information_geodata.infrastructuur_dijkringen,shape',)
-            for item, item_type in zip(items[:-1:2], items[1:-1:2]):
+            for item, item_type in zip(items[:-1:2], items[1::2]):
                 if 'shape' in item_type:
                     with tempfile.TemporaryDirectory(prefix='liwo_') as tmp_dir:
                         # export table to shapefile
                         table = item
                         filename = table.split('.')[-1]
                         path = pathlib.Path(tmp_dir) / (filename + '.shp')
+                        # Password should be available in evironment variabel: PGPASSWORD
                         args = [
                             "pgsql2shp",
                             "-f", str(path),
                             "-h", url.host,
                             "-p", str(url.port),
                             "-u", url.username,
-                            "-P", url.password,
                             url.database,
                             table
                         ]
@@ -54,7 +54,7 @@ def add_result_to_zip(result, url, data_dir):
                 elif 'tif' in item_type:
                     path = data_dir / item.lstrip('/')
                     zf.write(path, path.name)
-                    layer_logger.debug(f"item {item} not added")
+                    layer_logger.debug(f"item {item} added")
 
         zf.writestr('log.txt', log_stream.getvalue())
 
