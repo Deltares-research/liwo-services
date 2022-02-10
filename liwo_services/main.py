@@ -34,8 +34,8 @@ def create_app_db():
     # Add cache
     app.config["CACHE_TYPE"] = "SimpleCache"
     app.config["CACHE_DEFAULT_TIMEOUT"] = os.environ.get(
-        "CACHE_DEFAULT_TIMEOUT", 60 * 60 * 24
-    )  # 1 day
+        "CACHE_DEFAULT_TIMEOUT", 0
+    )  # infinite
     cache = Cache(app)
 
     # add cors headers
