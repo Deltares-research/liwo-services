@@ -9,6 +9,7 @@ import tempfile
 import subprocess
 
 import flask
+from flask import Blueprint
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from sqlalchemy import create_engine, MetaData, Table
@@ -41,8 +42,13 @@ def create_app_db():
 
 app, db = create_app_db()
 
+v1 = Blueprint("version1", "version1")
+v2 = Blueprint('version2', "version2")
+
+
 # Create a URL route in our application for "/"
-@app.route('/')
+@v1.route('/')
+@v2.route('/')
 def home():
     """
     This function just responds to the browser ULR
@@ -52,8 +58,7 @@ def home():
     """
     return 'liwo_service'
 
-
-@app.route('/liwo.ws/Authentication.asmx/Login', methods=["OPTIONS", "POST"])
+@v1.route('/liwo.ws/Authentication.asmx/Login', methods=["OPTIONS", "POST"])
 def loadLayerSets():
     """
     returns maplayersets. Login is not used anymore, but frontend still expects this.
@@ -94,7 +99,12 @@ def loadLayerSets():
 
     return {"d": layersets_string}
 
-@app.route('/liwo.ws/Tools/FloodImage.asmx/GetScenariosPerBreachGeneric', methods=["POST"])
+@v2.route('/load_layer_sets', methods=["GET"])
+def load_layer_sets():
+    layersets = {}
+    return layersets
+
+@v1.route('/liwo.ws/Tools/FloodImage.asmx/GetScenariosPerBreachGeneric', methods=["POST"])
 def loadBreachLayer():
     """
     Return Scenarios for a breachlocation.
@@ -134,8 +144,13 @@ def loadBreachLayer():
     result = rs.fetchall()
     return {"d": json.dumps(result[0][0])}
 
+@v2.route('/load_breach_layer', methods=["POST"])
+def load_breach_layer():
+    return {layerset}
 
-@app.route('/liwo.ws/Maps.asmx/GetLayerSet', methods=["POST"])
+
+@v1.route('/liwo.ws/Maps.asmx/GetLayerSet', methods=["POST"])
+@v2.route('/liwo.ws/Maps.asmx/GetLayerSet', methods=["POST"])
 def loadLayerSetById():
     """
     body: { id }
@@ -150,7 +165,8 @@ def loadLayerSetById():
     result = rs.fetchall()
     return {'d': json.dumps(result[0][0])}
 
-@app.route('/liwo.ws/Maps.asmx/GetBreachLocationId', methods=["POST"])
+@v1.route('/liwo.ws/Maps.asmx/GetBreachLocationId', methods=["POST"])
+@v2.route('/liwo.ws/Maps.asmx/GetBreachLocationId', methods=["POST"])
 def getFeatureIdByScenarioId():
     """
     body:{ floodsimulationid: scenarioId }
@@ -167,7 +183,8 @@ def getFeatureIdByScenarioId():
 
     return {'d': json.dumps(result[0][0])}
 
-@app.route('/liwo.ws/Maps.asmx/DownloadZipFileDataLayers', methods=["POST"])
+@v1.route('/liwo.ws/Maps.asmx/DownloadZipFileDataLayers', methods=["POST"])
+@v2.route('/liwo.ws/Maps.asmx/DownloadZipFileDataLayers', methods=["POST"])
 def download_zip():
     """
     body: {"layers":"scenario_18734,gebiedsindeling_doorbraaklocaties_buitendijks","name":"test"}
@@ -207,6 +224,10 @@ def download_zip():
         as_attachment=True
     )
     return resp
+
+app.register_blueprint(v1, url_prefix="/v1")
+app.register_blueprint(v2, url_prefix="/v2")
+app.register_blueprint(v1, url_prefix="/")
 
 if __name__ == "__main__":
     # Only for debugging while developing
