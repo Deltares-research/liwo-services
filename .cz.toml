@@ -1,0 +1,11 @@
+[tool]
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.1.1"
+tag_format = "v$version"
+version_files = [
+    "setup.py:^version",
+    "liwo_services/__init__.py:__version__",
+]
+
+annotated_tag = true
