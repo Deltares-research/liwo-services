@@ -177,6 +177,16 @@ def load_breach_layer():
     result = rs.fetchone()
     return json.dumps(result[0])
 
+@v2.route("/filter_variants", methods=["GET"])
+def filter_variants():
+    """
+    Return list of filter properties
+    """
+
+    properties = ["Overschrijdingsfrequentie", "Stormvloedkering open"]
+
+    return json.dumps(properties)
+
 
 @v1.route("/liwo.ws/Maps.asmx/GetLayerSet", methods=["POST"])
 @v2.route("/liwo.ws/Maps.asmx/GetLayerSet", methods=["POST"])
