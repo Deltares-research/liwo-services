@@ -32,7 +32,7 @@ def test_root(client):
     result = client.get('/')
     assert result.status_code == 200
 
-def test_filter_varaiants_v2(client):
+def test_filter_variants_v2(client):
     """Test variants properties filter endpoint"""
     result = client.get('/v2/filter_variants')
     assert result.status_code == 200
