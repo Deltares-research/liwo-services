@@ -32,11 +32,13 @@ def test_root(client):
     result = client.get('/')
     assert result.status_code == 200
 
+@pytest.mark.db
 def test_login(client):
     """Test the login url"""
     result = client.post('/liwo.ws/Authentication.asmx/Login', {})
     assert result.status_code == 200
 
+@pytest.mark.db
 def test_scenarios_per_breach(client):
     """Test the scenarios_per_breach url"""
     body = {'layername': "waterdiepte", "breachid": 1}
