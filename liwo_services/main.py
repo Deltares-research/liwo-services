@@ -5,7 +5,7 @@ import pathlib
 
 import flask
 import sqlalchemy.engine.url
-from flask import Flask, request
+from flask import Blueprint, Flask, request
 from flask_caching import Cache
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -53,8 +53,13 @@ def create_app_db():
 
 app, db, cache = create_app_db()
 
+v1 = Blueprint("version1", "version1")
+v2 = Blueprint("version2", "version2")
 
-@app.route("/")
+
+# Create a URL route in our application for "/"
+@v1.route("/")
+@v2.route("/")
 def home():
     """
     This function just responds to the browser ULR
@@ -64,8 +69,8 @@ def home():
     """
     return {"liwo_service": "Hello World"}
 
-
-@app.route("/liwo.ws/Authentication.asmx/Login", methods=["OPTIONS", "POST"])
+@v1.route("/liwo.ws/Authentication.asmx/Login", methods=["OPTIONS", "POST"])
+@v2.route("/liwo.ws/Authentication.asmx/Login", methods=["OPTIONS", "POST"])
 @cache.cached()
 def loadLayerSets():
     """
@@ -108,8 +113,7 @@ def loadLayerSets():
 
     return {"d": layersets_string}
 
-
-@app.route(
+@v1.route(
     "/liwo.ws/Tools/FloodImage.asmx/GetScenariosPerBreachGeneric", methods=["POST"]
 )
 @cache.cached(make_cache_key=_post_request_cache_key)
@@ -152,8 +156,40 @@ def loadBreachLayer():
     result = rs.fetchone()
     return {"d": json.dumps(result[0])}
 
+@v2.route("/load_breach_layer", methods=["POST"])
+@cache.cached(make_cache_key=_post_request_cache_key)
+def load_breach_layer():
+    """
+    Return scanarios for a breachlocation.
 
-@app.route("/liwo.ws/Maps.asmx/GetLayerSet", methods=["POST"])
+    body: {
+        breachid: breachid
+    }
+    """
+
+    body = request.json
+    breach_id = body["breachid"]
+
+    query = "SELECT website.load_breach_layer(:breach_id)"
+
+
+    rs = db.session.execute(query, {"breach_id": breach_id})
+    result = rs.fetchone()
+    return json.dumps(result[0])
+
+@v2.route("/filter_variants", methods=["GET"])
+def filter_variants():
+    """
+    Return list of filter properties
+    """
+
+    properties = ["Overschrijdingsfrequentie", "Stormvloedkering open"]
+
+    return json.dumps(properties)
+
+
+@v1.route("/liwo.ws/Maps.asmx/GetLayerSet", methods=["POST"])
+@v2.route("/liwo.ws/Maps.asmx/GetLayerSet", methods=["POST"])
 @cache.cached(make_cache_key=_post_request_cache_key)
 def loadLayerSetById():
     """
@@ -171,7 +207,8 @@ def loadLayerSetById():
     return {"d": json.dumps(result[0])}
 
 
-@app.route("/liwo.ws/Maps.asmx/GetBreachLocationId", methods=["POST"])
+@v1.route("/liwo.ws/Maps.asmx/GetBreachLocationId", methods=["POST"])
+@v2.route("/liwo.ws/Maps.asmx/GetBreachLocationId", methods=["POST"])
 @cache.cached(make_cache_key=_post_request_cache_key)
 def getFeatureIdByScenarioId():
     """
@@ -192,7 +229,8 @@ def getFeatureIdByScenarioId():
     return {"d": json.dumps(result[0])}
 
 
-@app.route("/liwo.ws/Maps.asmx/DownloadZipFileDataLayers", methods=["POST"])
+@v1.route("/liwo.ws/Maps.asmx/DownloadZipFileDataLayers", methods=["POST"])
+@v2.route("/liwo.ws/Maps.asmx/DownloadZipFileDataLayers", methods=["POST"])
 def download_zip():
     """
     body: {"layers":"scenario_18734,gebiedsindeling_doorbraaklocaties_buitendijks","name":"test"}
@@ -231,6 +269,9 @@ def download_zip():
     )
     return resp
 
+app.register_blueprint(v1, url_prefix="/v1")
+app.register_blueprint(v2, url_prefix="/v2")
+app.register_blueprint(v1, url_prefix="/")
 
 if __name__ == "__main__":
     # Only for debugging while developing

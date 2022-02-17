@@ -32,6 +32,12 @@ def test_root(client):
     result = client.get('/')
     assert result.status_code == 200
 
+def test_filter_variants_v2(client):
+    """Test variants properties filter endpoint"""
+    result = client.get('/v2/filter_variants')
+    assert result.status_code == 200
+    assert b"Overschrijdingsfrequentie" in result.data
+
 @pytest.mark.db
 def test_login(client):
     """Test the login url"""
