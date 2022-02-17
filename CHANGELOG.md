@@ -1,3 +1,10 @@
+## v0.2.1 (2022-02-17)
+
+### Fix
+
+- CI by skipping DB tests.
+- CI by skipping DB tests.
+
 ## v0.2.0 (2022-02-17)
 
 ### Feat
