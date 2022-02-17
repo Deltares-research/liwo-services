@@ -1,3 +1,9 @@
+## v0.3.0 (2022-02-17)
+
+### Feat
+
+- Liwo 472 variants endpoint
+
 ## v0.2.1 (2022-02-17)
 
 ### Fix
