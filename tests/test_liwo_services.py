@@ -29,7 +29,7 @@ def client():
 
 def test_root(client):
     """Test the root url"""
-    result = client.get('/api')
+    result = client.get('/')
     assert result.status_code == 200
 
 def test_filter_variants_v2(client):
