@@ -34,21 +34,21 @@ def test_root(client):
 
 def test_filter_variants_v2(client):
     """Test variants properties filter endpoint"""
-    result = client.get('/v2/filter_variants')
+    result = client.get('/api/v2/filter_variants')
     assert result.status_code == 200
     assert b"Overschrijdingsfrequentie" in result.data
 
 @pytest.mark.db
 def test_login(client):
     """Test the login url"""
-    result = client.post('/liwo.ws/Authentication.asmx/Login', {})
+    result = client.post('/api/liwo.ws/Authentication.asmx/Login', {})
     assert result.status_code == 200
 
 @pytest.mark.db
 def test_scenarios_per_breach(client):
     """Test the scenarios_per_breach url"""
     body = {'layername': "waterdiepte", "breachid": 1}
-    result = client.post('/liwo.ws/Tools/FloodImage.asmx/GetScenariosPerBreachGeneric', json=body)
+    result = client.post('/api/liwo.ws/Tools/FloodImage.asmx/GetScenariosPerBreachGeneric', json=body)
     assert result.status_code == 200
 
 
