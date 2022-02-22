@@ -269,9 +269,10 @@ def download_zip():
     )
     return resp
 
-app.register_blueprint(v1, url_prefix="/api/v1")
-app.register_blueprint(v2, url_prefix="/api/v2")
-app.register_blueprint(v1, url_prefix="/")
+app.register_blueprint(v1, name="api_v1", url_prefix="/api/v1")
+app.register_blueprint(v2, name="api_v2", url_prefix="/api/v2")
+app.register_blueprint(v1, name="root", url_prefix="/")
+app.register_blueprint(v1, name="api", url_prefix="/api")
 
 if __name__ == "__main__":
     # Only for debugging while developing
