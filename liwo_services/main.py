@@ -180,7 +180,7 @@ def load_breach_layer():
 @v2.route("/filter_variants", methods=["GET"])
 def filter_variants():
     """
-    Return list of filter properties
+    Return list of filter properties for variants
     """
 
     properties = ["Overschrijdingsfrequentie", "Status SVK", "Bres"]
