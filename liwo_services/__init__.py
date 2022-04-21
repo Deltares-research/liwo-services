@@ -2,4 +2,4 @@
 
 __author__ = """Fedor Baart"""
 __email__ = "fedor.baart@deltares.nl"
-__version__ = "0.3.2"
+__version__ = "0.3.3"

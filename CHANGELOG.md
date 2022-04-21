@@ -1,3 +1,10 @@
+## v0.3.3 (2022-04-21)
+
+### Fix
+
+- **variants**: fix properties to filter
+- **variants**: fix properties to filter
+
 ## v0.3.2 (2022-02-22)
 
 ## v0.3.1 (2022-02-22)
