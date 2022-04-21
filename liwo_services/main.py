@@ -183,7 +183,7 @@ def filter_variants():
     Return list of filter properties
     """
 
-    properties = ["Overschrijdingsfrequentie", "Stormvloedkering open"]
+    properties = ["Overschrijdingsfrequentie", "Status SVK", "Bres"]
 
     return json.dumps(properties)
 
