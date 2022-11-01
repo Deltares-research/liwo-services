@@ -183,7 +183,9 @@ def filter_variants():
     Return list of filter properties for variants
     """
 
-    properties = ["Overschrijdingsfrequentie", "Status SVK", "Bres"]
+    properties = ["Overschrijdingsfrequentie", "Status SVK", "Bres", "Moment van falen", "Toestand SVK", "Waterstandsverloop"
+    , "Bresvorming dijk", "Bresvorming kunstwerk", "Standzekerheid achterliggende lijnelementen", "Ingrepen in watersysteem", "Klimaatscenario"
+    , "VariantKeuze_1", "VariantKeuze_2", "VariantKeuze_3", "VariantKeuze_4", "VariantKeuze_5", "VariantKeuze_6"]
 
     return json.dumps(properties)
 
