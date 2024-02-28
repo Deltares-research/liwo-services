@@ -7,6 +7,8 @@ on:
 
 jobs:
   bump-version:
+    permissions:
+      contents: write
     if: "!startsWith(github.event.head_commit.message, 'bump:')"
     runs-on: ubuntu-latest
     name: "Bump version and create release with commitizen changelog"
