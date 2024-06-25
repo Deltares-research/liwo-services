@@ -26,6 +26,16 @@ LIWO Backend Services
 * Documentation: https://liwo-services.readthedocs.io.
 
 
+Update dependencies
+--------
+
+Install from requirements:
+pip install --upgrade -r requirements.txt
+
+Update requirements.txt:
+pip list --format=freeze > requirements.txt
+
+
 Features
 --------
 
