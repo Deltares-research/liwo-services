@@ -1,4 +1,4 @@
-FROM tiangolo/uwsgi-nginx-flask:python3.8-2022-11-28
+FROM tiangolo/uwsgi-nginx-flask:python3.8
 
 # no questions please...
 ENV DEBIAN_FRONTEND=noninteractive
