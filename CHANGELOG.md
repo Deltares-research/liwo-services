@@ -1,3 +1,9 @@
+## v0.3.7 (2024-06-25)
+
+### Fix
+
+- upgrade dependencies base on python3.8
+
 ## v0.3.6 (2024-06-25)
 
 ### Fix
