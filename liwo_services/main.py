@@ -266,9 +266,9 @@ def download_zip():
     zip_stream = liwo_services.export.add_result_to_zip(result, url, data_dir)
 
     resp = flask.send_file(
-        zip_stream,
+        path_or_file=zip_stream,
         mimetype="application/zip",
-        attachment_filename="{}.zip".format(name),
+        download_name="{}.zip".format(name),
         as_attachment=True,
     )
     return resp
