@@ -34,6 +34,7 @@ def add_result_to_zip(result, url, data_dir):
                         filename = table.split('.')[-1]
                         path = pathlib.Path(tmp_dir) / (filename + '.shp')
                         # Password should be available in evironment variable: PGPASSWORD
+
                         args = [
                             "pgsql2shp",
                             "-f", str(path),
@@ -45,7 +46,14 @@ def add_result_to_zip(result, url, data_dir):
                         ]
                         # TODO: how to just pass args
                         cmd = " ".join(args)
-                        process = subprocess.run(cmd, shell=True, capture_output=True)
+                        try:
+                            process = subprocess.run(cmd, shell=True, capture_output=True,timeout=600)
+
+                        except Exception as e:
+                            path_temp = pathlib.Path(tmp_dir) / "log_temp.txt"
+                            with path_temp.open('w') as fout:
+                                fout.write(e)
+
                         if process.returncode:
                             layer_logger.debug(f"error exporting {table}: {' '.join(args)}\nstdout:\n{process.stdout}\nstderr:\n {process.stderr}")
                         for f in pathlib.Path(tmp_dir).glob('*'):
