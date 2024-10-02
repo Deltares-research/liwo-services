@@ -1,3 +1,9 @@
+## v0.3.13 (2024-10-02)
+
+### Fix
+
+- end point added to search breach id based on scenario id
+
 ## v0.3.12 (2024-09-04)
 
 ### Fix
