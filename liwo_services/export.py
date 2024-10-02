@@ -34,6 +34,7 @@ def add_result_to_zip(result, url, data_dir):
                         filename = table.split('.')[-1]
                         path = pathlib.Path(tmp_dir) / (filename + '.shp')
                         # Password should be available in evironment variable: PGPASSWORD
+                        #pgsql2shp -f C:\tmp\test.shp -h localhost -p 5434 -u postgres -P liwo liwo static_information_geodata.evac_droge_verdiepingen_gebouwen_nederland5
 
                         args = [
                             "pgsql2shp",
@@ -60,11 +61,14 @@ def add_result_to_zip(result, url, data_dir):
                             zf.write(f, f.name)
                         layer_logger.debug(f"table {table} added")
                 elif 'tif' in item_type:
-                    path = data_dir / item.lstrip('/')
-                    zf.write(path, path.name)
-                    layer_logger.debug(f"item {item} added")
-
+                    try:
+                        path = data_dir / item.lstrip('/')
+                        zf.write(path, path.name)
+                        layer_logger.debug(f"item {item} added")
+                    except Exception as e:
+                        zf.writestr('log_temp.txt', str(e))
         zf.writestr('log.txt', log_stream.getvalue())
+        
 
     # rewind
     zip_stream.seek(0)
