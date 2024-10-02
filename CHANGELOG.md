@@ -1,3 +1,9 @@
+## v0.3.15 (2024-10-02)
+
+### Fix
+
+- now also catch error in tiff file export
+
 ## v0.3.14 (2024-10-02)
 
 ### Fix
