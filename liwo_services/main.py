@@ -62,7 +62,7 @@ v2 = Blueprint("version2", "version2")
 
 # Create a URL route in our application for "/"
 @v1.route("/")
-@v2.route("/")
+@v2.route("/") # /api/v2/
 def home():
     """
     This function just responds to the browser ULR
@@ -178,6 +178,27 @@ def load_breach_layer():
     rs = db.session.execute(query, {"breach_id": breach_id})
     result = rs.fetchone()
     return json.dumps(result[0])
+
+@v2.route("/get_breach_id", methods=["POST"])
+@cache.cached(make_cache_key=_post_request_cache_key)
+def get_breach_id():
+    """
+    Return breachlocation for scenario id.
+
+    body: {
+        scenario_id: scenario_id
+    }
+    """
+
+    body = request.json
+    scenario_id = body["scenario_id"]
+
+    query = text("SELECT breachlocations_id FROM static_information.tbl_floodsimulations WHERE id=(:scenario_id)")
+
+    rs = db.session.execute(query, {"scenario_id": scenario_id})
+    result = rs.fetchone()
+    return json.dumps(result[0])
+    
 
 @v2.route("/filter_variants", methods=["GET"])
 def filter_variants():
