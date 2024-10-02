@@ -1,3 +1,9 @@
+## v0.3.14 (2024-10-02)
+
+### Fix
+
+- catch zipfile error by logging to temp file and explicit subprocess timeout test
+
 ## v0.3.13 (2024-10-02)
 
 ### Fix
