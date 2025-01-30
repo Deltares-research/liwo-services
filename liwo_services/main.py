@@ -241,7 +241,7 @@ def filter_variants():
 @v2.route("/version_number", methods=["GET"])
 def version_number():
     """
-    Returns the version number LIWO database
+    Returns the version number LIWO database through the api.Q!
     """
     query = text("SELECT  * FROM static_information_geodata.versie_nummer")
     rs = db.session.execute(query)
