@@ -212,6 +212,19 @@ def filter_variants():
 
     return json.dumps(properties)
 
+@v2.route("/version_number", methods=["GET"])
+def version_number():
+    """
+    Returns the version number LIWO database
+    """
+    {}
+    # querys dartaba
+    query = text("SELECT  * FROM static_information_geodata.versie_nummer")
+    rs = db.session.execute(query)
+    result = rs.fetchone()
+    
+    return result
+
 
 @v1.route("/liwo.ws/Maps.asmx/GetLayerSet", methods=["POST"])
 @v2.route("/liwo.ws/Maps.asmx/GetLayerSet", methods=["POST"])
