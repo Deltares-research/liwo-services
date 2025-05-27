@@ -245,9 +245,9 @@ def version_number():
     """
     query = text("SELECT  * FROM static_information_geodata.versie_nummer")
     rs = db.session.execute(query)
-    result = rs.fetchone()
+    result = rs.fetchall()
 
-    return result
+    return json.dumps(result)
 
 
 @v1.route("/liwo.ws/Maps.asmx/GetLayerSet", methods=["POST"])
