@@ -7,6 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get -y update && apt-get -y upgrade && apt-get -y install postgis gdal-bin
 
 COPY requirements.txt /tmp/requirements.txt
+COPY custom_nginx.conf  /etc/nginx/conf.d/custom_nginx.conf
 
 # add python dependencies
 RUN pip install -r /tmp/requirements.txt
