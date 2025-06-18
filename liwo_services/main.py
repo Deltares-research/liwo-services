@@ -316,7 +316,7 @@ def download_zip():
 
     # setup logging 
     # Define a file handler for logging
-    log_file_path = os.path.join(app.config["DATA_DIR"], "layer_download.log")
+    log_file_path = pathlib.Path.cwd() /  "layer_download.log"
     file_handler = logging.FileHandler(log_file_path)
     file_handler.setLevel(logging.DEBUG)
 
@@ -364,6 +364,13 @@ def download_zip():
         )
     except Exception as e:
         logger.error("Error sending file: %s", e, exc_info=True)
+        # handle logging gracefully
+        resp = flask.send_file(
+            path_or_file=log_file_path,
+            mimetype="text/plain",
+            download_name="Error.txt",
+            as_attachment=True,
+        )
     return resp
 
 
