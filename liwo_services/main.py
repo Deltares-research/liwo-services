@@ -315,15 +315,21 @@ def download_zip():
     query = text("SELECT website.sp_select_filepaths_maplayers(:map_layers)")
 
     # setup logging 
-    log_stream = io.StringIO()
-    # define a handler
+    # Define a file handler for logging
+    log_file_path = os.path.join(app.config["DATA_DIR"], "layer_download.log")
+    file_handler = logging.FileHandler(log_file_path)
+    file_handler.setLevel(logging.DEBUG)
+
+    # Create a logger
     logger = logging.getLogger('layer-download')
     logger.setLevel(logging.DEBUG)
+
+    # Remove any existing handlers
     for handler in logger.handlers:
         logger.removeHandler(handler)
-    # add the new handler
-    handler = logging.StreamHandler(log_stream)
-    logger.addHandler(handler)
+
+    # Add the file handler
+    logger.addHandler(file_handler)
 
     try: 
         rs = db.session.execute(query, dict(map_layers=layers_str))
