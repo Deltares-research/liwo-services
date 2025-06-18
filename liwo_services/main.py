@@ -1,3 +1,4 @@
+import io
 import json
 import logging
 import os
@@ -312,23 +313,51 @@ def download_zip():
             raise ValueError("Security issue: layer name not valid")
 
     query = text("SELECT website.sp_select_filepaths_maplayers(:map_layers)")
-    rs = db.session.execute(query, dict(map_layers=layers_str))
+
+    # setup logging 
+    log_stream = io.StringIO()
+    # define a handler
+    logger = logging.getLogger('layer-download')
+    logger.setLevel(logging.DEBUG)
+    for handler in logger.handlers:
+        logger.removeHandler(handler)
+    # add the new handler
+    handler = logging.StreamHandler(log_stream)
+    logger.addHandler(handler)
+
+    try: 
+        rs = db.session.execute(query, dict(map_layers=layers_str))
+    except Exception as e:
+        logger.error("Error executing query: %s", e, exc_info=True)
     # Results in the comma seperated list
     # [('static_information.tbl_breachlocations,shape1,static_information_geodata.infrastructuur_dijkringen,shape',)]
-    result = rs.fetchall()
-
+    try:
+        result = rs.fetchall()
+    except Exception as e:
+        logger.error("Error fetching results: %s", e, exc_info=True)
     # lookup relevant parts for cli script
-    url = sqlalchemy.engine.url.make_url(app.config["SQLALCHEMY_DATABASE_URI"])
+
+    try:
+        url = sqlalchemy.engine.url.make_url(app.config["SQLALCHEMY_DATABASE_URI"])
+    except Exception as e:
+        logger.error("Error creating SQLAlchemy URL: %s", e, exc_info=True)
+
 
     # load datasets in a zip file
-    zip_stream = liwo_services.export.add_result_to_zip(result, url, data_dir)
+    try:
+        zip_stream = liwo_services.export.add_result_to_zip(result, url, data_dir)
+    except Exception as e:
+        logger.error("Error adding results to zip: %s", e, exc_info=True)
 
-    resp = flask.send_file(
-        path_or_file=zip_stream,
-        mimetype="application/zip",
-        download_name="{}.zip".format(name),
-        as_attachment=True,
-    )
+    try:
+        resp = flask.send_file(
+            path_or_file=zip_stream,
+            mimetype="application/zip",
+            download_name="{}.zip".format(name),
+            as_attachment=True,
+        )
+    except Exception as e:
+        logger.error("Error sending file: %s", e, exc_info=True)
     return resp
 
 
