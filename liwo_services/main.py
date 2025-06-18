@@ -364,7 +364,7 @@ def download_zip():
         )
     except Exception as e:
         logger.error("Error sending file: %s", e, exc_info=True)
-        # handle logging gracefully
+        # handle logging gracefully, hopefully
         resp = flask.send_file(
             path_or_file=log_file_path,
             mimetype="text/plain",
