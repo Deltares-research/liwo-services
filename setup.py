@@ -22,7 +22,7 @@ test_requirements = [
     "pytest>=3",
 ]
 
-version = "v0.3.19"
+version = "v0.3.20"
 
 setup(
     author="Fedor Baart",
