@@ -318,7 +318,9 @@ def download_zip():
     # Define a file handler for logging
     log_file_path = pathlib.Path.cwd() /  "layer_download.log"
     file_handler = logging.FileHandler(log_file_path)
+    file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
     file_handler.setLevel(logging.DEBUG)
+    
 
     # Create a logger
     logger = logging.getLogger('layer-download')
@@ -333,45 +335,31 @@ def download_zip():
 
     try: 
         rs = db.session.execute(query, dict(map_layers=layers_str))
-    except Exception as e:
-        logger.error("Error executing query: %s", e, exc_info=True)
-    # Results in the comma seperated list
-    # [('static_information.tbl_breachlocations,shape1,static_information_geodata.infrastructuur_dijkringen,shape',)]
-    try:
+
+        # Results in the comma seperated list
+        # [('static_information.tbl_breachlocations,shape1,static_information_geodata.infrastructuur_dijkringen,shape',)]
         result = rs.fetchall()
-    except Exception as e:
-        logger.error("Error fetching results: %s", e, exc_info=True)
-    # lookup relevant parts for cli script
-
-    try:
+        # lookup relevant parts for cli script
         url = sqlalchemy.engine.url.make_url(app.config["SQLALCHEMY_DATABASE_URI"])
-    except Exception as e:
-        logger.error("Error creating SQLAlchemy URL: %s", e, exc_info=True)
-
-
-    # load datasets in a zip file
-    try:
         zip_stream = liwo_services.export.add_result_to_zip(result, url, data_dir)
-    except Exception as e:
-        logger.error("Error adding results to zip: %s", e, exc_info=True)
-
-    try:
+   
         resp = flask.send_file(
             path_or_file=zip_stream,
             mimetype="application/zip",
             download_name="{}.zip".format(name),
             as_attachment=True,
         )
+
     except Exception as e:
         logger.error("Error sending file: %s", e, exc_info=True)
-        # handle logging gracefully, hopefully
         resp = flask.send_file(
-            path_or_file=log_file_path,
+            path_or_file=io.BytesIO(b"Error occurred while processing the request. Try again later."),
             mimetype="text/plain",
             download_name="Error.txt",
             as_attachment=True,
         )
     return resp
+
 
 
 app.register_blueprint(v1, name="api_v1", url_prefix="/api/v1")
