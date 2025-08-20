@@ -352,7 +352,7 @@ def download_zip():
 
     except Exception as e:
         logger.error("Error sending file: %s", e, exc_info=True)
-        flask.abort(500, description="Error occurred while processing the request. Try again later.")
+        flask.abort(500, description="Error occurred while processing the request. Try again later. ")
     return resp
 
 
