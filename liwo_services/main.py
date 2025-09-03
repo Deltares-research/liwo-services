@@ -238,7 +238,7 @@ def filter_variants():
 
     return json.dumps(properties)
 
-
+@v1.route("/version_number", methods=["GET"])
 @v2.route("/version_number", methods=["GET"])
 def version_number():
     """
