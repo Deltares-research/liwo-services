@@ -249,7 +249,7 @@ def version_number():
     rs = db.session.execute(query)
     result = rs.fetchone()
 
-    return result
+    return {"d": json.dumps(result[0])}
 
 @v1.route("/liwo.ws/Maps.asmx/GetLayerSet", methods=["POST"])
 @v2.route("/liwo.ws/Maps.asmx/GetLayerSet", methods=["POST"])
