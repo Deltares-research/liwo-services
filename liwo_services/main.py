@@ -1,4 +1,3 @@
-import io
 import json
 import logging
 import os
@@ -238,6 +237,7 @@ def filter_variants():
 
     return json.dumps(properties)
 
+
 @v1.route("/version_number", methods=["GET"])
 @v2.route("/version_number", methods=["GET"])
 def version_number():
@@ -249,7 +249,6 @@ def version_number():
     result = rs.fetchone()
 
     return result
-
 
 @v1.route("/liwo.ws/Maps.asmx/GetLayerSet", methods=["POST"])
 @v2.route("/liwo.ws/Maps.asmx/GetLayerSet", methods=["POST"])
@@ -314,16 +313,17 @@ def download_zip():
 
     query = text("SELECT website.sp_select_filepaths_maplayers(:map_layers)")
 
-    # setup logging 
+    # setup logging
     # Define a file handler for logging
-    log_file_path = pathlib.Path.cwd() /  "layer_download.log"
+    log_file_path = pathlib.Path.cwd() / "layer_download.log"
     file_handler = logging.FileHandler(log_file_path)
-    file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+    file_handler.setFormatter(
+        logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    )
     file_handler.setLevel(logging.DEBUG)
-    
 
     # Create a logger
-    logger = logging.getLogger('layer-download')
+    logger = logging.getLogger("layer-download")
     logger.setLevel(logging.DEBUG)
 
     # Remove any existing handlers
@@ -333,7 +333,7 @@ def download_zip():
     # Add the file handler
     logger.addHandler(file_handler)
 
-    try: 
+    try:
         rs = db.session.execute(query, dict(map_layers=layers_str))
 
         # Results in the comma seperated list
@@ -342,7 +342,7 @@ def download_zip():
         # lookup relevant parts for cli script
         url = sqlalchemy.engine.url.make_url(app.config["SQLALCHEMY_DATABASE_URI"])
         zip_stream = liwo_services.export.add_result_to_zip(result, url, data_dir)
-   
+
         resp = flask.send_file(
             path_or_file=zip_stream,
             mimetype="application/zip",
@@ -352,9 +352,11 @@ def download_zip():
 
     except Exception as e:
         logger.error("Error sending file: %s", e, exc_info=True)
-        flask.abort(500, description="Error occurred while processing the request. Try again later. ")
+        flask.abort(
+            500,
+            description="Error occurred while processing the request. Try again later. ",
+        )
     return resp
-
 
 
 app.register_blueprint(v1, name="api_v1", url_prefix="/api/v1")
