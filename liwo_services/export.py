@@ -20,18 +20,23 @@ def add_result_to_zip(result, url, data_dir):
     layer_logger.addHandler(handler)
 
     zip_stream = io.BytesIO()
-    with zipfile.ZipFile(zip_stream, 'w') as zf:
 
+    shapefile_added = set()
+    with zipfile.ZipFile(zip_stream, 'w') as zf:
         for row in result:
             items = row[0].split(',')
             # this is an odd format
             # ('static_information.tbl_breachlocations,shape1,static_information_geodata.infrastructuur_dijkringen,shape',)
             for item, item_type in zip(items[:-1:2], items[1::2]):
                 if 'shape' in item_type:
+                    table = item
+                    filename = table.split('.')[-1]
+                    shapefile_added.add(filename)
+                    if filename in shapefile_added:
+                        layer_logger.debug(f"skipping duplicate shapefile {filename}")
+                        continue
                     with tempfile.TemporaryDirectory(prefix='liwo_') as tmp_dir:
                         # export table to shapefile
-                        table = item
-                        filename = table.split('.')[-1]
                         path = pathlib.Path(tmp_dir) / (filename + '.shp')
                         # Password should be available in evironment variable: PGPASSWORD
                         #pgsql2shp -f C:\tmp\test.shp -h localhost -p 5434 -u postgres -P liwo liwo static_information_geodata.evac_droge_verdiepingen_gebouwen_nederland5
