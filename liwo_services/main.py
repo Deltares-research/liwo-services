@@ -148,6 +148,7 @@ def loadBreachLayer():
         "slachtoffers": "Slachtoffers_flood_scenario_set",
         "getroffenen": "Getroffenen_flood_scenario_set",
         "aankomsttijd": "Aankomsttijd_flood_scenario_set",
+        "duur": "Duur_flood_scenario_set",
     }
 
     # Default value for setname
