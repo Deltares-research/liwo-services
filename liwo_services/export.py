@@ -32,7 +32,7 @@ def add_result_to_zip(result, url, data_dir):
                     table = item
                     filename = table.split('.')[-1]
                     shapefile_added.add(filename)
-                    if filename in shapefile_added: # avoid duplicates
+                    if filename in shapefile_added:
                         layer_logger.debug(f"skipping duplicate shapefile {filename}")
                         continue
                     with tempfile.TemporaryDirectory(prefix='liwo_') as tmp_dir:
