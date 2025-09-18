@@ -148,6 +148,7 @@ def loadBreachLayer():
         "slachtoffers": "Slachtoffers_flood_scenario_set",
         "getroffenen": "Getroffenen_flood_scenario_set",
         "aankomsttijd": "Aankomsttijd_flood_scenario_set",
+        "duur": "Duur_flood_scenario_set",
     }
 
     # Default value for setname
@@ -248,7 +249,7 @@ def version_number():
     rs = db.session.execute(query)
     result = rs.fetchone()
 
-    return result
+    return {"d": json.dumps(result[0])}
 
 @v1.route("/liwo.ws/Maps.asmx/GetLayerSet", methods=["POST"])
 @v2.route("/liwo.ws/Maps.asmx/GetLayerSet", methods=["POST"])
