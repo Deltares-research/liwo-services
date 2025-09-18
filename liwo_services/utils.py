@@ -5,6 +5,7 @@ from flask import request
 
 logger = logging.getLogger(__name__)
 
+
 def _post_request_cache_key():
     """Create cache keys based on request body."""
     # hash the request body so it can be
