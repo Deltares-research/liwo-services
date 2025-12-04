@@ -248,8 +248,10 @@ def version_number():
     query = text("SELECT  * FROM static_information_geodata.versie_nummer")
     rs = db.session.execute(query)
     result = rs.fetchone()
+    logger.info("Version number requested: %s", result)
 
-    return {"d": json.dumps(result[0])}
+    return {"Version date database": f"{result[1]}"}
+
 
 @v1.route("/liwo.ws/Maps.asmx/GetLayerSet", methods=["POST"])
 @v2.route("/liwo.ws/Maps.asmx/GetLayerSet", methods=["POST"])
@@ -370,5 +372,6 @@ if __name__ == "__main__":
     portnumber = 80
     if os.environ.get("PORT") is not None:
         portnumber = os.environ.get("PORT")
+    logger.info("Starting LIWO services on port %s", portnumber)
 
     app.run(host="0.0.0.0", debug=True, port=portnumber, threaded=True)

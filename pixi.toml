@@ -1,0 +1,62 @@
+[workspace]
+authors = ["David Haasnoot <Daafips@gmail.com>"]
+channels = ["conda-forge"]
+name = "liwo-services"
+platforms = ["win-64"]
+version = "0.1.0"
+
+[tasks]
+# liwo_services run
+start = { cmd = "python liwo_services/cli.py --env-file .env run"}
+
+[feature.common.dependencies]
+python=">=3.11.0,<3.12.0"
+aniso8601 = "==9.0.1"
+blinker = "==1.8.2"
+cachelib = "==0.9.0"
+click = "==8.1.7"
+colorama = "==0.4.6"
+Flask = "==3.0.3"
+Flask-Caching = "==2.3.0"
+Flask-Cors = "==4.0.1"
+Flask-RESTful = "==0.3.10"
+Flask-SQLAlchemy = "==3.1.1"
+greenlet = "==3.0.3"
+importlib_metadata = "==7.2.1"
+itsdangerous = "==2.2.0"
+Jinja2 = "==3.1.4"
+MarkupSafe = "==2.1.5"
+pip = "==24.0"
+psycopg2 = "==2.9.9"
+python-dotenv = "==1.0.1"
+pytz = "==2024.1"
+setuptools = "==69.5.1"
+six = "==1.16.0"
+SQLAlchemy = "==2.0.31"
+typing_extensions = "==4.12.2"
+Werkzeug = "==3.0.3"
+wheel = "==0.43.0"
+zipp = "==3.19.2"
+
+[feature.dev.dependencies]
+wheel = "==0.43.0"
+watchdog = ">=2.1.0,<2.2.0"
+flake8 = ">=4.0.0,<4.1.0"
+tox = ">=3.24.0,<3.25.0"
+coverage = ">=6.3.0,<7.0.0"
+Sphinx = ">=4.4.0,<4.5.0"
+twine = ">=3.8.0,<3.9.0"
+pytest = ">=7.0.0,<8.0.0"
+pytest-runner = ">=5.3.0,<5.4.0"
+commitizen = ">=2.20.0,<2.21.0"
+black = ">=22.1.0,<22.2.0"
+# added later in pixi
+ipykernel = ">=6.29.5,<7"
+requests = ">=2.32.5,<3"
+
+[feature.common.pypi-dependencies]
+liwo_services = { path = ".", editable = true }
+
+[environments]
+default = { features = ["common", "dev"] }
+prod = { features = ["common"] }
