@@ -1,3 +1,21 @@
+## v0.3.24 (2025-09-18)
+
+### Fix
+
+- removing dumplicates, run ruff formating
+
+## v0.3.23 (2025-09-18)
+
+### Fix
+
+- bump
+
+## v0.3.22 (2025-08-20)
+
+### Fix
+
+- flask error
+
 ## v0.3.21 (2025-07-02)
 
 ## v0.3.20 (2025-06-25)
