@@ -158,8 +158,11 @@ def loadBreachLayer():
      TODO: remove setname directly use layerName.
     """
 
+    fname = "breach_layer.log"
+    logger_name = "breach-layer"
+    logger = setup_in_depth_logging(fname, logger_name)
     body = request.json
-
+    logger.debug("Request body: %s", body)
     # Set names according to c-sharp backend
     set_names = {
         "waterdiepte": "Waterdiepte_flood_scenario_set",
@@ -175,6 +178,8 @@ def loadBreachLayer():
     default_set_name = "Waterdiepte_flood_scenario_set"
     set_name = set_names.get(body.get("layername", ""), default_set_name)
     breach_id = body["breachid"]
+    logger.debug("Breach id %s", breach_id)
+
 
     # define query with parameters
     query = text(
@@ -183,6 +188,8 @@ def loadBreachLayer():
 
     rs = db.session.execute(query, {"breach_id": breach_id, "set_name": set_name})
     result = rs.fetchone()
+    logger.debug("Result  %s", result)
+
     return {"d": json.dumps(result[0])}
 
 
