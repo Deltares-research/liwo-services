@@ -22,6 +22,27 @@ from liwo_services.utils import _post_request_cache_key
 
 logger = logging.getLogger(__name__)
 
+def setup_in_depth_logging(fname, logger_name):
+        # setup logging
+    # Define a file handler for logging
+    log_file_path = pathlib.Path.cwd() / fname
+    file_handler = logging.FileHandler(log_file_path)
+    file_handler.setFormatter(
+        logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    )
+    file_handler.setLevel(logging.DEBUG)
+
+    # Create a logger
+    logger = logging.getLogger(logger_name)
+    logger.setLevel(logging.DEBUG)
+
+    # Remove any existing handlers
+    for handler in logger.handlers:
+        logger.removeHandler(handler)
+
+    # Add the file handler
+    logger.addHandler(file_handler)
+    return logger
 
 def create_app_db():
     """load the dot env values"""
@@ -313,25 +334,9 @@ def download_zip():
 
     query = text("SELECT website.sp_select_filepaths_maplayers(:map_layers)")
 
-    # setup logging
-    # Define a file handler for logging
-    log_file_path = pathlib.Path.cwd() / "layer_download.log"
-    file_handler = logging.FileHandler(log_file_path)
-    file_handler.setFormatter(
-        logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-    )
-    file_handler.setLevel(logging.DEBUG)
-
-    # Create a logger
-    logger = logging.getLogger("layer-download")
-    logger.setLevel(logging.DEBUG)
-
-    # Remove any existing handlers
-    for handler in logger.handlers:
-        logger.removeHandler(handler)
-
-    # Add the file handler
-    logger.addHandler(file_handler)
+    fname = "layer_download.log"
+    logger_name = "layer-download"
+    logger = setup_in_depth_logging(fname, logger_name)
 
     try:
         rs = db.session.execute(query, dict(map_layers=layers_str))
