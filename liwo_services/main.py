@@ -22,6 +22,37 @@ from liwo_services.utils import _post_request_cache_key
 
 logger = logging.getLogger(__name__)
 
+def setup_in_depth_logging(fname, logger_name, mode="a"):
+    """"
+    Mainly meant to debug the backend issues.
+    
+    E.g.: 
+    >> # add temp logger
+    >> fname = "breach_layer.log"
+    >> logger_name = "breach-layer"
+    >> logger = setup_in_depth_logging(fname, logger_name)
+    >> logger.debug("Request body: %s", body)
+
+    """
+    # Define a file handler for logging
+    log_file_path = pathlib.Path.cwd() / fname
+    file_handler = logging.FileHandler(log_file_path, mode=mode)
+    file_handler.setFormatter(
+        logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    )
+    file_handler.setLevel(logging.DEBUG)
+
+    # Create a logger
+    logger = logging.getLogger(logger_name)
+    logger.setLevel(logging.DEBUG)
+
+    # Remove any existing handlers
+    for handler in logger.handlers:
+        logger.removeHandler(handler)
+
+    # Add the file handler
+    logger.addHandler(file_handler)
+    return logger
 
 def create_app_db():
     """load the dot env values"""
@@ -137,6 +168,7 @@ def loadBreachLayer():
      TODO: remove setname directly use layerName.
     """
 
+
     body = request.json
 
     # Set names according to c-sharp backend
@@ -149,11 +181,13 @@ def loadBreachLayer():
         "getroffenen": "Getroffenen_flood_scenario_set",
         "aankomsttijd": "Aankomsttijd_flood_scenario_set",
         "duur": "Duur_flood_scenario_set",
+    # added duur voor BRS, let op deze namen moeten ook in de frontend aangepast worden.
     }
 
     # Default value for setname
     default_set_name = "Waterdiepte_flood_scenario_set"
-    set_name = set_names.get(body.get("layername", ""), default_set_name)
+    layer_name = body.get("layername", "")
+    set_name = set_names.get(layer_name, default_set_name)
     breach_id = body["breachid"]
 
     # define query with parameters
@@ -163,6 +197,8 @@ def loadBreachLayer():
 
     rs = db.session.execute(query, {"breach_id": breach_id, "set_name": set_name})
     result = rs.fetchone()
+    logger.debug("Result  %s", result)
+
     return {"d": json.dumps(result[0])}
 
 
@@ -316,25 +352,9 @@ def download_zip():
 
     query = text("SELECT website.sp_select_filepaths_maplayers(:map_layers)")
 
-    # setup logging
-    # Define a file handler for logging
-    log_file_path = pathlib.Path.cwd() / "layer_download.log"
-    file_handler = logging.FileHandler(log_file_path)
-    file_handler.setFormatter(
-        logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-    )
-    file_handler.setLevel(logging.DEBUG)
-
-    # Create a logger
-    logger = logging.getLogger("layer-download")
-    logger.setLevel(logging.DEBUG)
-
-    # Remove any existing handlers
-    for handler in logger.handlers:
-        logger.removeHandler(handler)
-
-    # Add the file handler
-    logger.addHandler(file_handler)
+    fname = "layer_download.log"
+    logger_name = "layer-download"
+    logger = setup_in_depth_logging(fname, logger_name)
 
     try:
         rs = db.session.execute(query, dict(map_layers=layers_str))
