@@ -1,3 +1,9 @@
+## v0.3.25 (2025-12-04)
+
+### Fix
+
+- add duur to loadBreachLayer
+
 ## v0.3.24 (2025-09-18)
 
 ### Fix
