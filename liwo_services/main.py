@@ -22,11 +22,20 @@ from liwo_services.utils import _post_request_cache_key
 
 logger = logging.getLogger(__name__)
 
-def setup_in_depth_logging(fname, logger_name):
-        # setup logging
+def setup_in_depth_logging(fname, logger_name, mode="a"):
+    """"Mainly meant to debug the backend issues.
+    
+    E.g.: 
+    >> # add temp logger
+    >> fname = "breach_layer.log"
+    >> logger_name = "breach-layer"
+    >> logger = setup_in_depth_logging(fname, logger_name)
+    >> logger.debug("Request body: %s", body)
+
+    """
     # Define a file handler for logging
     log_file_path = pathlib.Path.cwd() / fname
-    file_handler = logging.FileHandler(log_file_path)
+    file_handler = logging.FileHandler(log_file_path, mode=mode)
     file_handler.setFormatter(
         logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
     )
@@ -158,11 +167,9 @@ def loadBreachLayer():
      TODO: remove setname directly use layerName.
     """
 
-    fname = "breach_layer.log"
-    logger_name = "breach-layer"
-    logger = setup_in_depth_logging(fname, logger_name)
+
     body = request.json
-    logger.debug("Request body: %s", body)
+
     # Set names according to c-sharp backend
     set_names = {
         "waterdiepte": "Waterdiepte_flood_scenario_set",
@@ -172,14 +179,15 @@ def loadBreachLayer():
         "slachtoffers": "Slachtoffers_flood_scenario_set",
         "getroffenen": "Getroffenen_flood_scenario_set",
         "aankomsttijd": "Aankomsttijd_flood_scenario_set",
+        "duur": "Duur_flood_scenario_set",
+
     }
 
     # Default value for setname
     default_set_name = "Waterdiepte_flood_scenario_set"
-    set_name = set_names.get(body.get("layername", ""), default_set_name)
+    layer_name = body.get("layername", "")
+    set_name = set_names.get(layer_name, default_set_name)
     breach_id = body["breachid"]
-    logger.debug("Breach id %s", breach_id)
-
 
     # define query with parameters
     query = text(
