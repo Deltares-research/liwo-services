@@ -23,7 +23,8 @@ from liwo_services.utils import _post_request_cache_key
 logger = logging.getLogger(__name__)
 
 def setup_in_depth_logging(fname, logger_name, mode="a"):
-    """"Mainly meant to debug the backend issues.
+    """"
+    Mainly meant to debug the backend issues.
     
     E.g.: 
     >> # add temp logger
@@ -180,7 +181,7 @@ def loadBreachLayer():
         "getroffenen": "Getroffenen_flood_scenario_set",
         "aankomsttijd": "Aankomsttijd_flood_scenario_set",
         "duur": "Duur_flood_scenario_set",
-
+    # added duur voor BRS, let op deze namen moeten ook in de frontend aangepast worden.
     }
 
     # Default value for setname
