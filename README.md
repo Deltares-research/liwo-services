@@ -17,7 +17,7 @@ Update requirements.txt:
 
 ### pixi is easier
 
-`pixi install` (default includes dev)
+`pixi install` (default includes dev )
 
 or
 
