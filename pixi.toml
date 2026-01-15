@@ -7,7 +7,8 @@ version = "0.1.0"
 
 [tasks]
 # liwo_services run
-start = { cmd = "python liwo_services/cli.py --env-file .env run"}
+start_dev = { cmd = "python liwo_services/cli.py --env-file .env run"} # defaults to port 5000
+start = { cmd = "python liwo_services/cli.py --env-file .env run --port 5001"}
 
 [feature.common.dependencies]
 python=">=3.11.0,<3.12.0"
