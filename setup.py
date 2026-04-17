@@ -4,7 +4,7 @@
 
 from setuptools import find_packages, setup
 
-with open("README.rst") as readme_file:
+with open("README.md") as readme_file:
     readme = readme_file.read()
 
 with open("HISTORY.rst") as history_file:
@@ -22,7 +22,7 @@ test_requirements = [
     "pytest>=3",
 ]
 
-version = "v0.3.24"
+version = "v0.3.26"
 
 setup(
     author="Fedor Baart",

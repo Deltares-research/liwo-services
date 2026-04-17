@@ -5,6 +5,8 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
+    options:
+      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       win-64:
       - conda: https://conda.anaconda.org/conda-forge/noarch/_python_abi3_support-1.0-hd8ed1ab_2.conda
@@ -170,6 +172,8 @@ environments:
     - url: https://conda.anaconda.org/conda-forge/
     indexes:
     - https://pypi.org/simple
+    options:
+      pypi-prerelease-mode: if-necessary-or-explicit
     packages:
       win-64:
       - conda: https://conda.anaconda.org/conda-forge/noarch/aniso8601-9.0.1-pyhd8ed1ab_1.conda
@@ -1139,8 +1143,8 @@ packages:
   timestamp: 1727963768015
 - pypi: ./
   name: liwo-services
-  version: 0.3.24
-  sha256: a65e06391223c7d1fca3f943b4f81d4ba4488023e056ba3b00051b52524e5db9
+  version: 0.3.26
+  sha256: 865888124054d2ed76166d3ed81c77a91c8c49c8d0612daf197970bee36d61d4
   requires_dist:
   - click>=7.0
   requires_python: '>=3.5'
