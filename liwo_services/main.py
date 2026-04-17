@@ -284,8 +284,10 @@ def version_number():
     query = text("SELECT  * FROM static_information_geodata.versie_nummer")
     rs = db.session.execute(query)
     result = rs.fetchone()
+    logger.info("Version number requested: %s", result)
 
-    return {"d": json.dumps(result[0])}
+    return {"Version date database": f"{result[1]}"}
+
 
 @v1.route("/liwo.ws/Maps.asmx/GetLayerSet", methods=["POST"])
 @v2.route("/liwo.ws/Maps.asmx/GetLayerSet", methods=["POST"])
@@ -379,6 +381,82 @@ def download_zip():
         )
     return resp
 
+@v1.route("/liwo.ws/Maps.asmx/DownloadZipFileDataLayers_v2", methods=["POST"])
+@v2.route("/liwo.ws/Maps.asmx/DownloadZipFileDataLayers_v2", methods=["POST"])
+def download_zip_v2():
+    """
+    body: {"layers":"scenario_18734,gebiedsindeling_doorbraaklocaties_buitendijks","name":"test"}
+    """
+    body = request.json
+    layers = body.get("layers", "").split(",")
+    layers_str = body.get("layers", "")
+    name = body.get("name", "").strip()
+    if not name:
+        name = "DownloadLIWO"
+
+    data_dir = pathlib.Path(app.config["DATA_DIR"])
+
+    # security check
+    for layer in layers:
+        if ".." in layer or layer.startswith("/"):
+            raise ValueError("Security issue: layer name not valid")
+
+    query = text("SELECT website.sp_select_filepaths_maplayers(:map_layers)")
+
+    # setup logging
+    # Define a file handler for logging
+    log_file_path = pathlib.Path.cwd() / "layer_download.log"
+    file_handler = logging.FileHandler(log_file_path)
+    file_handler.setFormatter(
+        logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    )
+    file_handler.setLevel(logging.DEBUG)
+
+    # Create a logger
+    logger = logging.getLogger("layer-download")
+    logger.setLevel(logging.DEBUG)
+
+    # Remove any existing handlers
+    for handler in logger.handlers:
+        logger.removeHandler(handler)
+
+    # Add the file handler
+    logger.addHandler(file_handler)
+
+    try:
+        rs = db.session.execute(query, dict(map_layers=layers_str))
+
+        # Results in the comma seperated list
+        # [('static_information.tbl_breachlocations,shape1,static_information_geodata.infrastructuur_dijkringen,shape',)]
+        result = rs.fetchall()
+        # lookup relevant parts for cli script
+        url = sqlalchemy.engine.url.make_url(app.config["SQLALCHEMY_DATABASE_URI"])
+        zip_path  = liwo_services.export.add_result_to_zip_v2(result, url, data_dir)
+
+        @flask.after_this_request
+        def cleanup(response):
+            try:
+                os.remove(zip_path)
+            except OSError:
+                pass
+            return response
+    
+        resp = flask.send_file(
+            path_or_file=zip_path,
+            mimetype="application/zip",
+            download_name="{}.zip".format(name),
+            as_attachment=True,
+        )
+
+
+    except Exception as e:
+        logger.error("Error sending file: %s", e, exc_info=True)
+        flask.abort(
+            500,
+            description="Error occurred while processing the request. Try again later. ",
+        )
+    return resp
+
 
 app.register_blueprint(v1, name="api_v1", url_prefix="/api/v1")
 app.register_blueprint(v2, name="api_v2", url_prefix="/api/v2")
@@ -390,5 +468,6 @@ if __name__ == "__main__":
     portnumber = 80
     if os.environ.get("PORT") is not None:
         portnumber = os.environ.get("PORT")
+    logger.info("Starting LIWO services on port %s", portnumber)
 
     app.run(host="0.0.0.0", debug=True, port=portnumber, threaded=True)
