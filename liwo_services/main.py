@@ -431,7 +431,7 @@ def download_zip_v2():
         result = rs.fetchall()
         # lookup relevant parts for cli script
         url = sqlalchemy.engine.url.make_url(app.config["SQLALCHEMY_DATABASE_URI"])
-        zip_path  = liwo_services.export_v2.add_result_to_zip(result, url, data_dir)
+        zip_path  = liwo_services.export.add_result_to_zip_v2(result, url, data_dir)
 
         @flask.after_this_request
         def cleanup(response):
