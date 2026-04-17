@@ -433,7 +433,7 @@ def download_zip_v2():
         url = sqlalchemy.engine.url.make_url(app.config["SQLALCHEMY_DATABASE_URI"])
         zip_path  = liwo_services.export_v2.add_result_to_zip(result, url, data_dir)
 
-        @after_this_request
+        @flask.after_this_request
         def cleanup(response):
             try:
                 os.remove(zip_path)
