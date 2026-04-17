@@ -3,6 +3,7 @@
 LIWO Backend Services
 
 * Free software: GNU General Public License v3
+
 * Documentation: [https://liwo-services.readthedocs.io](https://liwo-services.readthedocs.io)
 
 ## Update dependencies
