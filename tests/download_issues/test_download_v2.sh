@@ -1,7 +1,27 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BASE_URL="${1:-http://localhost:5001/}"
+DEFAULT_BASE_URL="http://localhost:5001/"
+BASE_URL="$DEFAULT_BASE_URL"
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -b|--base-url)
+            if [[ -z "${2:-}" ]]; then
+                echo "ERROR: Missing value for $1" >&2
+                exit 1
+            fi
+            BASE_URL="$2"
+            shift 2
+            ;;
+        *)
+            echo "ERROR: Unknown argument: $1" >&2
+            echo "Usage: $0 [--base-url URL]" >&2
+            exit 1
+            ;;
+    esac
+done
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 URL="${BASE_URL}liwo.ws/Maps.asmx/DownloadZipFileDataLayers_v2"
 
