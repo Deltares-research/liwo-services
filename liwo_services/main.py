@@ -385,6 +385,7 @@ def download_zip_v1_legacy():
 @v2.route("/liwo.ws/Maps.asmx/DownloadZipFileDataLayers", methods=["POST"])
 def download_zip():
     """
+    Latest version
     body: {"layers":"scenario_18734,gebiedsindeling_doorbraaklocaties_buitendijks","name":"test"}
     """
     body = request.json
