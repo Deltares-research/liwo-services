@@ -8,7 +8,10 @@ import logging
 
 
 def add_result_to_zip(result, url, data_dir):
-    """add item to zipfile. this requires extra info from url, retrieve data from data_dir"""
+    """
+    LEGACY: No longer used as of 2025.1.6d, but kept for reference. Build a zip of requested layers in memory and return a BytesIO stream.
+    Was too memory intensive for large TIFFs/shapefiles, so replaced by add_result_to_zip_v2 which builds the zip on disk and returns its path
+    add item to zipfile. this requires extra info from url, retrieve data from data_dir"""
     # TODO Add custom log stream for invalid layers
     log_stream = io.StringIO()
     # define a handler

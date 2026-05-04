@@ -21,7 +21,7 @@ def test_download(url, name, data):
 def test_download_small():
     print('testing download_small')
     base = "http://localhost:5001/"
-    url = base + "liwo.ws/Maps.asmx/DownloadZipFileDataLayers"
+    url = base + "liwo.ws/Maps.asmx/DownloadZipFileDataLayers_v1"
     name =  "test_download_small.zip"
     data = {'layers': 'MaximaleWaterdiepteNederland_Kaart1', 'name': name}
     test_download(url, name, data)
@@ -29,7 +29,7 @@ def test_download_small():
 def test_download_large():
     print('testing download_large')
     base = "http://localhost:5001/"
-    url = base + "liwo.ws/Maps.asmx/DownloadZipFileDataLayers"
+    url = base + "liwo.ws/Maps.asmx/DownloadZipFileDataLayers_v1"
     name =  "test_download_large.zip"
     data = {'layers': 'MaximaleWaterdiepteNederland_Kaart5', 'name': name}
     test_download(url, name, data)

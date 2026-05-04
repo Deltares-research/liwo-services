@@ -23,7 +23,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-URL="${BASE_URL}liwo.ws/Maps.asmx/DownloadZipFileDataLayers_v2"
+URL="${BASE_URL}liwo.ws/Maps.asmx/DownloadZipFileDataLayers"
 
 download_test() {
     local name="$1"
