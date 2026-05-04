@@ -330,9 +330,9 @@ def getFeatureIdByScenarioId():
     return {"d": json.dumps(result[0])}
 
 
-@v1.route("/liwo.ws/Maps.asmx/DownloadZipFileDataLayers", methods=["POST"])
-@v2.route("/liwo.ws/Maps.asmx/DownloadZipFileDataLayers", methods=["POST"])
-def download_zip():
+@v1.route("/liwo.ws/Maps.asmx/DownloadZipFileDataLayers_v1", methods=["POST"])
+@v2.route("/liwo.ws/Maps.asmx/DownloadZipFileDataLayers_v1", methods=["POST"])
+def download_zip_v1_legacy():
     """
     body: {"layers":"scenario_18734,gebiedsindeling_doorbraaklocaties_buitendijks","name":"test"}
     """
@@ -381,9 +381,9 @@ def download_zip():
         )
     return resp
 
-@v1.route("/liwo.ws/Maps.asmx/DownloadZipFileDataLayers_v2", methods=["POST"])
-@v2.route("/liwo.ws/Maps.asmx/DownloadZipFileDataLayers_v2", methods=["POST"])
-def download_zip_v2():
+@v1.route("/liwo.ws/Maps.asmx/DownloadZipFileDataLayers", methods=["POST"])
+@v2.route("/liwo.ws/Maps.asmx/DownloadZipFileDataLayers", methods=["POST"])
+def download_zip():
     """
     body: {"layers":"scenario_18734,gebiedsindeling_doorbraaklocaties_buitendijks","name":"test"}
     """
